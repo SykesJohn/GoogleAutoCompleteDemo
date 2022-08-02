@@ -1,0 +1,41 @@
+﻿@page "/autocomplete"
+@using Blazored.Typeahead
+@using GoogleApi.Entities.Places.Common
+
+@namespace GoogleAutoCompleteDemo.Pages
+
+<h3>AutoComplete</h3>
+<BlazoredTypeahead SearchMethod="@(async (addr) => await GetOptions(addr))" MinimumLength="4" ConvertMethod="ConvertItem"
+	Value="SelectedOptionId" TItem="Prediction" TValue="string"
+	ValueChanged="@(async (prediction) => {PredictionSelected(prediction); await OnDestinationChanged();})"
+	ValueExpression="@(() => SelectedOptionId)"
+	placeholder="Enter address or PoI">
+	<SelectedTemplate>
+		<span>@SelectedOption?.Description</span>
+	</SelectedTemplate>
+	<ResultTemplate>
+		@if(context != null)
+			{
+			@context.Description
+			}
+	</ResultTemplate>
+	<NotFoundTemplate>
+		No Location Found
+	</NotFoundTemplate>
+</BlazoredTypeahead>
+@if(SelectedOption != null)
+	{
+	<p>PlaceId: @SelectedOption.PlaceId</p>
+	<p>Matches: </p>
+	<ul>
+		@foreach(var m in SelectedOption.MatchedSubstrings)
+		{
+			<li>Offset @m.Offset</li>
+		}
+	</ul>
+	}
+
+@code {
+	private string? ConvertItem(Prediction P) => P?.PlaceId;
+
+}
